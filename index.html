@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>CinemaBooking - Trang Chủ</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body class="bg-gray-50">
+    <nav class="gradient-bg text-white shadow-lg">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex justify-between items-center h-16">
+          <div class="flex items-center">
+            <h1 class="text-2xl font-bold">🎬 CinemaBooking</h1>
+          </div>
+          <div class="hidden md:block">
+            <div class="ml-10 flex items-baseline space-x-4">
+              <a
+                href="index.html"
+                class="nav-link px-3 py-2 rounded-md text-sm font-medium bg-white bg-opacity-20"
+                >Trang Chủ</a
+              >
+              <a
+                href="movies.html"
+                class="nav-link px-3 py-2 rounded-md text-sm font-medium hover:bg-white hover:bg-opacity-20 transition-colors"
+                >Phim</a
+              >
+              <a
+                href="booking.html"
+                class="nav-link px-3 py-2 rounded-md text-sm font-medium hover:bg-white hover:bg-opacity-20 transition-colors"
+                >Đặt Vé</a
+              >
+              <a
+                href="history.html"
+                class="nav-link px-3 py-2 rounded-md text-sm font-medium hover:bg-white hover:bg-opacity-20 transition-colors"
+                >Lịch Sử</a
+              >
+              <a
+                href="admin.html"
+                class="nav-link px-3 py-2 rounded-md text-sm font-medium hover:bg-white hover:bg-opacity-20 transition-colors"
+                >Quản Trị</a
+              >
+            </div>
+          </div>
+          <div class="flex items-center space-x-4">
+            <button
+              onclick="showLoginModal()"
+              class="bg-white text-purple-600 px-4 py-2 rounded-lg font-medium hover:bg-gray-100 transition-colors"
+            >
+              Đăng Nhập
+            </button>
+          </div>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <!-- Hero Section -->
+      <div class="gradient-bg rounded-2xl p-8 mb-8 text-white scroll-animate">
+        <div class="max-w-4xl mx-auto text-center">
+          <h2 class="text-4xl font-bold mb-4 scroll-animate-scale">
+            Trải Nghiệm Điện Ảnh Tuyệt Vời
+          </h2>
+          <p class="text-xl mb-6 scroll-animate">
+            Đặt vé xem phim online dễ dàng, nhanh chóng với hệ thống hiện đại
+          </p>
+          <a
+            href="movies.html"
+            class="inline-block bg-white text-purple-600 px-8 py-3 rounded-lg font-semibold hover:bg-gray-100 transition-colors scroll-animate-scale"
+            >Xem Phim Ngay</a
+          >
+        </div>
+      </div>
+
+      <!-- Featured Movies -->
+      <div class="mb-8 scroll-animate">
+        <h3 class="text-2xl font-bold mb-6 scroll-animate-left">
+          Phim Đang Chiếu
+        </h3>
+        <div
+          class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6"
+          id="featured-movies"
+        >
+          <!-- Movies will be loaded here -->
+        </div>
+      </div>
+
+      <!-- Statistics -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8 scroll-animate">
+        <div
+          class="bg-white p-6 rounded-xl shadow-md text-center scroll-animate-left"
+        >
+          <div class="text-3xl font-bold text-purple-600 mb-2">150+</div>
+          <div class="text-gray-600">Phim Đang Chiếu</div>
+        </div>
+        <div
+          class="bg-white p-6 rounded-xl shadow-md text-center scroll-animate"
+        >
+          <div class="text-3xl font-bold text-purple-600 mb-2">50K+</div>
+          <div class="text-gray-600">Khách Hàng Hài Lòng</div>
+        </div>
+        <div
+          class="bg-white p-6 rounded-xl shadow-md text-center scroll-animate-right"
+        >
+          <div class="text-3xl font-bold text-purple-600 mb-2">25</div>
+          <div class="text-gray-600">Rạp Chiếu Phim</div>
+        </div>
+      </div>
+    </main>
+
+    <!-- Login Modal -->
+    <div
+      id="login-modal"
+      class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50"
+    >
+      <div class="bg-white rounded-xl p-8 max-w-md w-full mx-4">
+        <div class="flex justify-between items-center mb-6">
+          <h3 class="text-2xl font-bold">Đăng Nhập</h3>
+          <button
+            onclick="hideLoginModal()"
+            class="text-gray-500 hover:text-gray-700"
+          >
+            <svg
+              class="w-6 h-6"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M6 18L18 6M6 6l12 12"
+              ></path>
+            </svg>
+          </button>
+        </div>
+        <form onsubmit="login(event)" class="space-y-4">
+          <input
+            type="email"
+            placeholder="Email"
+            class="w-full px-4 py-3 border rounded-lg"
+            required
+          />
+          <input
+            type="password"
+            placeholder="Mật khẩu"
+            class="w-full px-4 py-3 border rounded-lg"
+            required
+          />
+          <button
+            type="submit"
+            class="w-full bg-purple-600 text-white py-3 rounded-lg font-semibold hover:bg-purple-700 transition-colors"
+          >
+            Đăng Nhập
+          </button>
+        </form>
+        <div class="text-center mt-4">
+          <a href="#" class="text-purple-600 hover:underline"
+            >Chưa có tài khoản? Đăng ký ngay</a
+          >
+        </div>
+      </div>
+    </div>
+
+    <script src="data.js"></script>
+    <script src="common.js"></script>
+    <script>
+      // Load featured movies on home page
+      function loadFeaturedMovies() {
+        const container = document.getElementById("featured-movies");
+        container.innerHTML = movies
+          .slice(0, 4)
+          .map(
+            (movie, index) => `
+            <div class="movie-card bg-white rounded-xl shadow-md overflow-hidden cursor-pointer scroll-animate stagger-animation" 
+                 style="--delay: ${index * 0.1}s" onclick="selectMovieAndBook(${
+              movie.id
+            })">
+                <div class="h-48 bg-gradient-to-br from-purple-400 to-blue-500 flex items-center justify-center text-6xl">
+                    ${movie.poster}
+                </div>
+                <div class="p-4">
+                    <h4 class="font-bold text-lg mb-2">${movie.title}</h4>
+                    <p class="text-gray-600 text-sm mb-2">${
+                      movie.description
+                    }</p>
+                    <div class="flex justify-between items-center">
+                        <span class="text-purple-600 font-semibold">${
+                          movie.duration
+                        } phút</span>
+                        <span class="text-green-600 font-bold">${movie.price.toLocaleString()} VNĐ</span>
+                    </div>
+                </div>
+            </div>
+        `
+          )
+          .join("");
+
+        setTimeout(() => {
+          initScrollAnimations();
+        }, 100);
+      }
+
+      // Select movie and navigate to booking
+      function selectMovieAndBook(movieId) {
+        localStorage.setItem("selectedMovie", movieId);
+        window.location.href = "booking.html";
+      }
+
+      // Initialize the page
+      document.addEventListener("DOMContentLoaded", function () {
+        loadFeaturedMovies();
+        initScrollAnimations();
+        document.documentElement.style.scrollBehavior = "smooth";
+      });
+    </script>
+  </body>
+</html>

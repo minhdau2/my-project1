@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CinemaBooking - Đặt Vé</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body class="bg-gray-50">
+    <!-- Navigation -->
+    <nav class="gradient-bg text-white shadow-lg">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center">
+                    <h1 class="text-2xl font-bold">🎬 CinemaBooking</h1>
+                </div>
+                <div class="hidden md:block">
+                    <div class="ml-10 flex items-baseline space-x-4">
+                        <a href="index.html" class="nav-link px-3 py-2 rounded-md text-sm font-medium hover:bg-white hover:bg-opacity-20 transition-colors">Trang Chủ</a>
+                        <a href="movies.html" class="nav-link px-3 py-2 rounded-md text-sm font-medium hover:bg-white hover:bg-opacity-20 transition-colors">Phim</a>
+                        <a href="booking.html" class="nav-link px-3 py-2 rounded-md text-sm font-medium bg-white bg-opacity-20">Đặt Vé</a>
+                        <a href="history.html" class="nav-link px-3 py-2 rounded-md text-sm font-medium hover:bg-white hover:bg-opacity-20 transition-colors">Lịch Sử</a>
+                        <a href="admin.html" class="nav-link px-3 py-2 rounded-md text-sm font-medium hover:bg-white hover:bg-opacity-20 transition-colors">Quản Trị</a>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <button onclick="showLoginModal()" class="bg-white text-purple-600 px-4 py-2 rounded-lg font-medium hover:bg-gray-100 transition-colors">Đăng Nhập</button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <!-- Movie Selection -->
+            <div class="lg:col-span-2">
+                <div class="bg-white rounded-xl shadow-md p-6 mb-6 scroll-animate-left">
+                    <h3 class="text-xl font-bold mb-4">Chọn Phim & Suất Chiếu</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                        <select id="movie-select" class="px-4 py-2 border rounded-lg" onchange="loadShowtimes()">
+                            <option value="">Chọn phim</option>
+                        </select>
+                        <select id="showtime-select" class="px-4 py-2 border rounded-lg" onchange="loadSeats()">
+                            <option value="">Chọn suất chiếu</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Seat Selection -->
+                <div class="bg-white rounded-xl shadow-md p-6 scroll-animate-left">
+                    <h3 class="text-xl font-bold mb-4">Chọn Ghế Ngồi</h3>
+                    <div class="mb-4">
+                        <div class="screen"></div>
+                    </div>
+                    <div id="seat-map" class="flex flex-col items-center space-y-2">
+                        <!-- Seats will be generated here -->
+                    </div>
+                    <div class="flex justify-center space-x-6 mt-6 text-sm">
+                        <div class="flex items-center">
+                            <div class="seat available mr-2"></div>
+                            <span>Trống</span>
+                        </div>
+                        <div class="flex items-center">
+                            <div class="seat selected mr-2"></div>
+                            <span>Đã chọn</span>
+                        </div>
+                        <div class="flex items-center">
+                            <div class="seat occupied mr-2"></div>
+                            <span>Đã đặt</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Booking Summary -->
+            <div class="lg:col-span-1">
+                <div class="bg-white rounded-xl shadow-md p-6 sticky top-4 scroll-animate-right">
+                    <h3 class="text-xl font-bold mb-4">Thông Tin Đặt Vé</h3>
+                    <div id="booking-summary" class="space-y-3 mb-6">
+                        <div class="text-gray-500">Chưa chọn phim</div>
+                    </div>
+                    <div class="border-t pt-4">
+                        <div class="flex justify-between items-center text-lg font-bold">
+                            <span>Tổng cộng:</span>
+                            <span id="total-price">0 VNĐ</span>
+                        </div>
+                    </div>
+                    <button id="confirm-booking" onclick="proceedToPayment()" class="w-full bg-purple-600 text-white py-3 rounded-lg font-semibold mt-4 hover:bg-purple-700 transition-colors disabled:bg-gray-400" disabled>
+                        Tiến Hành Thanh Toán
+                    </button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Login Modal -->
+    <div id="login-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
+        <div class="bg-white rounded-xl p-8 max-w-md w-full mx-4">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-2xl font-bold">Đăng Nhập</h3>
+                <button onclick="hideLoginModal()" class="text-gray-500 hover:text-gray-700">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
+            </div>
+            <form onsubmit="login(event)" class="space-y-4">
+                <input type="email" placeholder="Email" class="w-full px-4 py-3 border rounded-lg" required>
+                <input type="password" placeholder="Mật khẩu" class="w-full px-4 py-3 border rounded-lg" required>
+                <button type="submit" class="w-full bg-purple-600 text-white py-3 rounded-lg font-semibold hover:bg-purple-700 transition-colors">Đăng Nhập</button>
+            </form>
+            <div class="text-center mt-4">
+                <a href="#" class="text-purple-600 hover:underline">Chưa có tài khoản? Đăng ký ngay</a>
+            </div>
+        </div>
+    </div>
+
+    <script src="data.js"></script>
+    <script src="common.js"></script>
+    <script>
+        let currentBooking = {
+            movie: null,
+            showtime: null,
+            seats: [],
+            total: 0
+        };
+        let selectedSeats = [];
+
+        // Load booking page
+        function loadBookingPage() {
+            const movieSelect = document.getElementById('movie-select');
+            movieSelect.innerHTML = '<option value="">Chọn phim</option>' + 
+                movies.map(movie => `<option value="${movie.id}">${movie.title}</option>`).join('');
+            
+            // Check if movie was pre-selected
+            const selectedMovieId = localStorage.getItem('selectedMovie');
+            if (selectedMovieId) {
+                movieSelect.value = selectedMovieId;
+                loadShowtimes();
+                localStorage.removeItem('selectedMovie');
+            }
+        }
+
+        // Load showtimes
+        function loadShowtimes() {
+            const movieId = document.getElementById('movie-select').value;
+            const showtimeSelect = document.getElementById('showtime-select');
+            
+            if (movieId) {
+                const movie = getMovieById(movieId);
+                showtimeSelect.innerHTML = '<option value="">Chọn suất chiếu</option>' +
+                    movie.showtimes.map(time => `<option value="${time}">${time}</option>`).join('');
+                currentBooking.movie = movie;
+            } else {
+                showtimeSelect.innerHTML = '<option value="">Chọn suất chiếu</option>';
+                currentBooking.movie = null;
+            }
+            updateBookingSummary();
+        }
+
+        // Load seats
+        function loadSeats() {
+            const showtime = document.getElementById('showtime-select').value;
+            const seatMap = document.getElementById('seat-map');
+            
+            if (showtime) {
+                currentBooking.showtime = showtime;
+                
+                // Generate seat map (10 rows, 15 seats per row)
+                const rows = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J'];
+                selectedSeats = [];
+                
+                seatMap.innerHTML = rows.map(row => `
+                    <div class="flex items-center space-x-1">
+                        <span class="w-6 text-center font-semibold text-gray-600">${row}</span>
+                        ${Array.from({length: 15}, (_, i) => {
+                            const seatNumber = i + 1;
+                            const seatId = `${row}${seatNumber}`;
+                            const isOccupied = Math.random() < 0.3; // 30% chance of being occupied
+                            return `<div class="seat ${isOccupied ? 'occupied' : 'available'}" 
+                                        data-seat="${seatId}" 
+                                        onclick="toggleSeat('${seatId}', ${isOccupied})"
+                                        title="Ghế ${seatId}">
+                                    </div>`;
+                        }).join('')}
+                        <span class="w-6 text-center font-semibold text-gray-600">${row}</span>
+                    </div>
+                `).join('');
+            } else {
+                seatMap.innerHTML = '';
+                currentBooking.showtime = null;
+            }
+            updateBookingSummary();
+        }
+
+        // Toggle seat selection
+        function toggleSeat(seatId, isOccupied) {
+            if (isOccupied) return;
+            
+            const seatElement = document.querySelector(`[data-seat="${seatId}"]`);
+            const isSelected = selectedSeats.includes(seatId);
+            
+            if (isSelected) {
+                selectedSeats = selectedSeats.filter(seat => seat !== seatId);
+                seatElement.classList.remove('selected');
+                seatElement.classList.add('available');
+            } else {
+                if (selectedSeats.length < 8) { // Max 8 seats
+                    selectedSeats.push(seatId);
+                    seatElement.classList.remove('available');
+                    seatElement.classList.add('selected');
+                } else {
+                    alert('Bạn chỉ có thể chọn tối đa 8 ghế!');
+                }
+            }
+            
+            currentBooking.seats = selectedSeats;
+            updateBookingSummary();
+        }
+
+        // Update booking summary
+        function updateBookingSummary() {
+            const summaryDiv = document.getElementById('booking-summary');
+            const totalPriceDiv = document.getElementById('total-price');
+            const confirmButton = document.getElementById('confirm-booking');
+            
+            if (!currentBooking.movie) {
+                summaryDiv.innerHTML = '<div class="text-gray-500">Chưa chọn phim</div>';
+                totalPriceDiv.textContent = '0 VNĐ';
+                confirmButton.disabled = true;
+                return;
+            }
+            
+            const total = currentBooking.movie.price * selectedSeats.length;
+            currentBooking.total = total;
+            
+            summaryDiv.innerHTML = `
+                <div><strong>Phim:</strong> ${currentBooking.movie.title}</div>
+                <div><strong>Suất chiếu:</strong> ${currentBooking.showtime || 'Chưa chọn'}</div>
+                <div><strong>Ghế:</strong> ${selectedSeats.length > 0 ? selectedSeats.join(', ') : 'Chưa chọn'}</div>
+                <div><strong>Số lượng:</strong> ${selectedSeats.length} vé</div>
+                <div><strong>Giá mỗi vé:</strong> ${formatCurrency(currentBooking.movie.price)}</div>
+            `;
+            
+            totalPriceDiv.textContent = formatCurrency(total);
+            confirmButton.disabled = !currentBooking.showtime || selectedSeats.length === 0;
+        }
+
+        // Proceed to payment
+        function proceedToPayment() {
+            if (!currentBooking.movie || !currentBooking.showtime || selectedSeats.length === 0) {
+                alert('Vui lòng chọn đầy đủ thông tin!');
+                return;
+            }
+            
+            // Save booking data to localStorage
+            localStorage.setItem('currentBooking', JSON.stringify(currentBooking));
+            window.location.href = 'payment.html';
+        }
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', function() {
+            loadBookingPage();
+        });
+    </script>
+</body>
+</html>

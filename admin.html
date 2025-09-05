@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CinemaBooking - Quản Trị</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body class="bg-gray-50">
+    <!-- Navigation -->
+    <nav class="gradient-bg text-white shadow-lg">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center">
+                    <h1 class="text-2xl font-bold">🎬 CinemaBooking</h1>
+                </div>
+                <div class="hidden md:block">
+                    <div class="ml-10 flex items-baseline space-x-4">
+                        <a href="index.html" class="nav-link px-3 py-2 rounded-md text-sm font-medium hover:bg-white hover:bg-opacity-20 transition-colors">Trang Chủ</a>
+                        <a href="movies.html" class="nav-link px-3 py-2 rounded-md text-sm font-medium hover:bg-white hover:bg-opacity-20 transition-colors">Phim</a>
+                        <a href="booking.html" class="nav-link px-3 py-2 rounded-md text-sm font-medium hover:bg-white hover:bg-opacity-20 transition-colors">Đặt Vé</a>
+                        <a href="history.html" class="nav-link px-3 py-2 rounded-md text-sm font-medium hover:bg-white hover:bg-opacity-20 transition-colors">Lịch Sử</a>
+                        <a href="admin.html" class="nav-link px-3 py-2 rounded-md text-sm font-medium bg-white bg-opacity-20">Quản Trị</a>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <button onclick="showLoginModal()" class="bg-white text-purple-600 px-4 py-2 rounded-lg font-medium hover:bg-gray-100 transition-colors">Đăng Nhập</button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <h2 class="text-3xl font-bold mb-6">Trang Quản Trị</h2>
+        
+        <!-- Statistics Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+            <div class="bg-white rounded-xl shadow-md p-6 text-center scroll-animate">
+                <div class="text-3xl font-bold text-purple-600 mb-2" id="total-revenue">0 VNĐ</div>
+                <div class="text-gray-600">Doanh thu hôm nay</div>
+            </div>
+            <div class="bg-white rounded-xl shadow-md p-6 text-center scroll-animate">
+                <div class="text-3xl font-bold text-blue-600 mb-2" id="tickets-sold">0</div>
+                <div class="text-gray-600">Vé đã bán</div>
+            </div>
+            <div class="bg-white rounded-xl shadow-md p-6 text-center scroll-animate">
+                <div class="text-3xl font-bold text-green-600 mb-2" id="total-movies">${movies.length}</div>
+                <div class="text-gray-600">Tổng số phim</div>
+            </div>
+            <div class="bg-white rounded-xl shadow-md p-6 text-center scroll-animate">
+                <div class="text-3xl font-bold text-orange-600 mb-2" id="occupancy-rate">0%</div>
+                <div class="text-gray-600">Tỷ lệ lấp đầy</div>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <!-- Movie Management -->
+            <div class="bg-white rounded-xl shadow-md p-6 scroll-animate-left">
+                <h3 class="text-xl font-bold mb-4">Quản Lý Phim</h3>
+                <form onsubmit="addMovie(event)" class="space-y-4">
+                    <input type="text" name="title" placeholder="Tên phim" class="w-full px-4 py-2 border rounded-lg" required>
+                    <select name="genre" class="w-full px-4 py-2 border rounded-lg" required>
+                        <option value="">Chọn thể loại</option>
+                        <option value="action">Hành động</option>
+                        <option value="comedy">Hài kịch</option>
+                        <option value="drama">Chính kịch</option>
+                        <option value="horror">Kinh dị</option>
+                    </select>
+                    <input type="number" name="duration" placeholder="Thời lượng (phút)" class="w-full px-4 py-2 border rounded-lg" required>
+                    <input type="number" name="price" placeholder="Giá vé (VNĐ)" class="w-full px-4 py-2 border rounded-lg" required>
+                    <textarea name="description" placeholder="Mô tả phim" class="w-full px-4 py-2 border rounded-lg h-20" required></textarea>
+                    <button type="submit" class="w-full bg-purple-600 text-white py-2 rounded-lg hover:bg-purple-700 transition-colors">Thêm Phim</button>
+                </form>
+            </div>
+
+            <!-- Recent Bookings -->
+            <div class="bg-white rounded-xl shadow-md p-6 scroll-animate-right">
+                <h3 class="text-xl font-bold mb-4">Đặt Vé Gần Đây</h3>
+                <div id="recent-bookings" class="space-y-3">
+                    <!-- Recent bookings will be loaded here -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Movie List Management -->
+        <div class="bg-white rounded-xl shadow-md p-6 mt-8 scroll-animate">
+            <h3 class="text-xl font-bold mb-4">Danh Sách Phim Hiện Tại</h3>
+            <div class="overflow-x-auto">
+                <table class="w-full table-auto">
+                    <thead>
+                        <tr class="bg-gray-50">
+                            <th class="px-4 py-2 text-left">Tên Phim</th>
+                            <th class="px-4 py-2 text-left">Thể Loại</th>
+                            <th class="px-4 py-2 text-left">Thời Lượng</th>
+                            <th class="px-4 py-2 text-left">Giá Vé</th>
+                            <th class="px-4 py-2 text-left">Thao Tác</th>
+                        </tr>
+                    </thead>
+                    <tbody id="admin-movies-list">
+                        <!-- Movies will be loaded here -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+    <!-- Login Modal -->
+    <div id="login-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
+        <div class="bg-white rounded-xl p-8 max-w-md w-full mx-4">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-2xl font-bold">Đăng Nhập</h3>
+                <button onclick="hideLoginModal()" class="text-gray-500 hover:text-gray-700">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
+            </div>
+            <form onsubmit="login(event)" class="space-y-4">
+                <input type="email" placeholder="Email" class="w-full px-4 py-3 border rounded-lg" required>
+                <input type="password" placeholder="Mật khẩu" class="w-full px-4 py-3 border rounded-lg" required>
+                <button type="submit" class="w-full bg-purple-600 text-white py-3 rounded-lg font-semibold hover:bg-purple-700 transition-colors">Đăng Nhập</button>
+            </form>
+            <div class="text-center mt-4">
+                <a href="#" class="text-purple-600 hover:underline">Chưa có tài khoản? Đăng ký ngay</a>
+            </div>
+        </div>
+    </div>
+
+    <script src="data.js"></script>
+    <script src="common.js"></script>
+    <script>
+        // Load admin statistics
+        function loadAdminStats() {
+            const totalRevenue = bookingHistory.reduce((sum, booking) => sum + booking.total, 0);
+            const ticketsSold = bookingHistory.reduce((sum, booking) => sum + booking.seats.length, 0);
+            const occupancyRate = Math.round((ticketsSold / (150 * 4)) * 100); // 150 seats, 4 showtimes
+            
+            document.getElementById('total-revenue').textContent = formatCurrency(totalRevenue);
+            document.getElementById('tickets-sold').textContent = ticketsSold;
+            document.getElementById('occupancy-rate').textContent = occupancyRate + '%';
+        }
+
+        // Load recent bookings
+        function loadRecentBookings() {
+            const container = document.getElementById('recent-bookings');
+            const recentBookings = bookingHistory.slice(-5).reverse();
+            
+            if (recentBookings.length === 0) {
+                container.innerHTML = '<div class="text-gray-500 text-center py-4">Chưa có đặt vé nào</div>';
+                return;
+            }
+            
+            container.innerHTML = recentBookings.map(booking => `
+                <div class="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
+                    <div>
+                        <div class="font-medium">${booking.movie}</div>
+                        <div class="text-sm text-gray-600">${booking.customerName} - ${booking.seats.length} vé</div>
+                    </div>
+                    <div class="text-right">
+                        <div class="font-medium text-green-600">${formatCurrency(booking.total)}</div>
+                        <div class="text-sm text-gray-600">${booking.date}</div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Load admin movies list
+        function loadAdminMoviesList() {
+            const container = document.getElementById('admin-movies-list');
+            container.innerHTML = movies.map(movie => `
+                <tr class="border-b hover:bg-gray-50">
+                    <td class="px-4 py-3">${movie.title}</td>
+                    <td class="px-4 py-3 capitalize">${movie.genre}</td>
+                    <td class="px-4 py-3">${movie.duration} phút</td>
+                    <td class="px-4 py-3">${formatCurrency(movie.price)}</td>
+                    <td class="px-4 py-3">
+                        <button onclick="editMovie(${movie.id})" class="text-blue-600 hover:underline mr-2">Sửa</button>
+                        <button onclick="deleteMovie(${movie.id})" class="text-red-600 hover:underline">Xóa</button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        // Add movie
+        function addMovie(event) {
+            event.preventDefault();
+            const form = event.target;
+            const formData = new FormData(form);
+            
+            const newMovie = {
+                id: Math.max(...movies.map(m => m.id)) + 1,
+                title: formData.get('title'),
+                genre: formData.get('genre'),
+                duration: parseInt(formData.get('duration')),
+                price: parseInt(formData.get('price')),
+                description: formData.get('description'),
+                poster: getRandomPoster(),
+                showtimes: ["10:00", "13:30", "16:45", "20:00"]
+            };
+            
+            movies.push(newMovie);
+            form.reset();
+            loadAdminMoviesList();
+            document.getElementById('total-movies').textContent = movies.length;
+            showSuccessModal('Thành công!', 'Phim mới đã được thêm vào hệ thống.');
+        }
+
+        // Get random poster emoji
+        function getRandomPoster() {
+            const posters = ['🎬', '🎭', '🎪', '🎨', '🎯', '🎲', '🎸', '🎺', '🎻', '🎤'];
+            return posters[Math.floor(Math.random() * posters.length)];
+        }
+
+        // Edit movie
+        function editMovie(movieId) {
+            const movie = movies.find(m => m.id === movieId);
+            if (movie) {
+                const newTitle = prompt('Tên phim mới:', movie.title);
+                if (newTitle && newTitle.trim()) {
+                    movie.title = newTitle.trim();
+                    loadAdminMoviesList();
+                    showSuccessModal('Cập nhật thành công!', 'Thông tin phim đã được cập nhật.');
+                }
+            }
+        }
+
+        // Delete movie
+        function deleteMovie(movieId) {
+            if (confirm('Bạn có chắc chắn muốn xóa phim này?')) {
+                const index = movies.findIndex(m => m.id === movieId);
+                if (index > -1) {
+                    movies.splice(index, 1);
+                    loadAdminMoviesList();
+                    document.getElementById('total-movies').textContent = movies.length;
+                    showSuccessModal('Xóa thành công!', 'Phim đã được xóa khỏi hệ thống.');
+                }
+            }
+        }
+F
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', function() {
+            loadAdminStats();
+            loadRecentBookings();
+            loadAdminMoviesList();
+        });
+    </script>
+</body>
+</html>
