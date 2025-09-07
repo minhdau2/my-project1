@@ -16,6 +16,9 @@
     transform: translateY(-8px);
     box-shadow: 0 20px 40px rgba(0,0,0,0.3);
 }
+.poster {
+  height: 200px;
+}
 
 .seat {
     width: 28px;
