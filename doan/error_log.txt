@@ -1,0 +1,2 @@
+[30-Oct-2025 21:36:31 Asia/Ho_Chi_Minh] PHP Warning:  mysqli_stmt::bind_param(): Number of elements in type definition string doesn't match number of bind variables in /home/uloehxcu/domains/minhouse.id.vn/public_html/suaMovies.php on line 78
+[30-Oct-2025 21:37:31 Asia/Ho_Chi_Minh] PHP Warning:  mysqli_stmt::bind_param(): Number of elements in type definition string doesn't match number of bind variables in /home/uloehxcu/domains/minhouse.id.vn/public_html/suaMovies.php on line 88

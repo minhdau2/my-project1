@@ -1,0 +1,396 @@
+<?php
+session_start();
+?>
+
+<!DOCTYPE html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>CinemaBooking - Danh Sách Phim</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body class="bg-gray-50">
+    <nav class="gradient-bg text-white shadow-lg">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex justify-between items-center h-16">
+          <div class="flex items-center">
+            <h1 class="text-2xl font-bold">🎬 CinemaBooking</h1>
+          </div>
+          <div class="hidden md:block">
+            <div class="ml-10 flex items-baseline space-x-4">
+              <a
+                href="index.php"
+                class="nav-link px-3 py-2 rounded-md text-sm font-medium hover:bg-white hover:bg-opacity-20 transition-colors"
+                >Trang Chủ</a
+              >
+              <div class="relative group">
+                <button class="px-3 py-2 hover:text-gray-300 flex items-center">
+                    Phim
+                    <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M19 9l-7 7-7-7" />
+                    </svg>
+                </button>
+
+                <div class="absolute left-0 mt-2 w-48 bg-white rounded-lg shadow-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                  <a href="dang_chieu.php" class="block px-4 py-2 text-gray-700 hover:bg-gray-100">Phim Đang Chiếu</a>
+                  <a href="sapchieu.php" class="block px-4 py-2 text-gray-700 hover:bg-gray-100">Phim Sắp Chiếu</a>
+                </div>
+            </div>
+
+              <a
+                href="booking.php"
+                class="nav-link px-3 py-2 rounded-md text-sm font-medium hover:bg-white hover:bg-opacity-20 transition-colors"
+                >Đặt Vé</a
+              >
+              <a
+                href="history.php"
+                class="nav-link px-3 py-2 rounded-md text-sm font-medium hover:bg-white hover:bg-opacity-20 transition-colors"
+                >Lịch Sử</a
+              >
+              <form action="search.php" method="GET" class="relative">
+                <input
+                  type="text"
+                  name="q"
+                  placeholder="Tìm kiếm phim..."
+                  class="pl-10 pr-4 py-2 rounded-full text-gray-800 focus:outline-none focus:ring-2 focus:ring-white"
+                />
+                <svg
+                  class="w-5 h-5 text-gray-400 absolute left-3 top-1/2 transform -translate-y-1/2"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M21 21l-4.35-4.35M17 10a7 7 0 11-14 0 7 7 0 0114 0z"
+                  />
+                </svg>
+              </form>
+            </div>
+          </div>
+          <div class="flex items-center space-x-4">
+            <?php if (isset($_SESSION['user'])): ?>
+                <div class="relative group">
+                    <button class="bg-white text-purple-600 px-4 py-2 rounded-lg font-medium">
+                        Xin chào, <?= htmlspecialchars($_SESSION['user']['name']) ?> ▼
+                    </button>
+                    <div class="absolute right-0 mt-1 w-48 bg-white rounded-lg shadow-lg hidden group-hover:block z-50">
+                        <a href="profile.php" class="block px-4 py-2 text-gray-700 hover:bg-gray-100">Thông tin cá nhân</a>
+                        <a href="history.php" class="block px-4 py-2 text-gray-700 hover:bg-gray-100">Lịch sử đặt vé</a>
+                        <a href="logout.php" class="block px-4 py-2 text-red-600 hover:bg-gray-100">Đăng xuất</a>
+                    </div>
+                </div>
+            <?php elseif (isset($_SESSION['admin'])): ?>
+                <div class="relative group">
+                    <button class="bg-white text-purple-600 px-4 py-2 rounded-lg font-medium">
+                        Xin chào, Admin <?= htmlspecialchars($_SESSION['admin']['name']) ?> ▼
+                    </button>
+                    <div class="absolute right-0 mt-1 w-48 bg-white rounded-lg shadow-lg hidden group-hover:block z-50">
+                        <a href="admin.php" class="block px-4 py-2 text-gray-700 hover:bg-gray-100">Quản trị</a>
+                        <a href="logout.php" class="block px-4 py-2 text-red-600 hover:bg-gray-100">Đăng xuất</a>
+                    </div>
+                </div>
+            <?php else: ?>
+                <button
+                  onclick="showLoginModal()"
+                  class="bg-white text-purple-600 px-4 py-2 rounded-lg font-medium hover:bg-gray-100 transition-colors"
+                >
+                  Đăng Nhập
+                </button>
+            <?php endif; ?>
+          </div>
+        </div>
+      </div>
+    </nav>
+
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div class="flex justify-between items-center mb-6 scroll-animate">
+        <h2 class="text-3xl font-bold scroll-animate-left">Danh Sách Phim</h2>
+        <div class="flex space-x-4 scroll-animate-right">
+          <!-- Filter: khi chọn sẽ chuyển trang với ?genre=... -->
+          <select
+            id="genre-filter"
+            class="px-4 py-2 border rounded-lg"
+            onchange="window.location.href='movies.php?genre=' + encodeURIComponent(this.value);"
+          >
+            <option value="">Tất cả thể loại</option>
+            <option value="action" <?= (isset($_GET['genre']) && $_GET['genre'] === 'action') ? 'selected' : '' ?>>Hành động</option>
+            <option value="comedy" <?= (isset($_GET['genre']) && $_GET['genre'] === 'comedy') ? 'selected' : '' ?>>Hài kịch</option>
+            <option value="drama" <?= (isset($_GET['genre']) && $_GET['genre'] === 'drama') ? 'selected' : '' ?>>Chính kịch</option>
+            <option value="horror" <?= (isset($_GET['genre']) && $_GET['genre'] === 'horror') ? 'selected' : '' ?>>Kinh dị</option>
+          </select>
+        </div>
+      </div>
+
+      <?php
+        require_once 'config/db.php';
+
+        $allowed_genres = ['action', 'comedy', 'drama', 'horror'];
+        $genreFilter = '';
+        if (isset($_GET['genre']) && $_GET['genre'] !== '') {
+            $g = $_GET['genre'];
+            if (in_array($g, $allowed_genres, true)) {
+                $genreFilter = $g;
+            } else {
+                $genreFilter = '';
+            }
+        }
+
+        if ($genreFilter !== '') {
+            // an toàn vì đã whitelist; nhưng vẫn dùng escape
+            $safe_genre = $conn->real_escape_string($genreFilter);
+            $sql = "SELECT id, title, genre, duration, price, description, poster FROM movies WHERE genre = '$safe_genre'";
+        } else {
+            $sql = "SELECT id, title, genre, duration, price, description, poster FROM movies";
+        }
+
+        $result = $conn->query($sql);
+      ?>
+      <div class="mb-8 scroll-animate">
+        <h3 class="text-2xl font-bold mb-6 scroll-animate-left">
+          Phim Đang Chiếu
+        </h3>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <?php
+            if ($result && $result->num_rows > 0) {
+              while($row = $result->fetch_assoc()) {
+                echo '<div class="movie-card bg-white rounded-xl shadow-md overflow-hidden cursor-pointer scroll-animate stagger-animation">';
+
+                // 🟣 1️⃣ Phần hình ảnh → bọc <a>
+                echo '  <a href="booking.php?movie_id=' . htmlspecialchars($row["id"]) . '" class="block h-48 overflow-hidden transition duration-700 ease-in-out">';
+                if (!empty($row["poster"])) {
+                    echo '    <img src="' . htmlspecialchars($row["poster"]) . '" alt="' . htmlspecialchars($row["title"]) . '" class="object-cover w-full h-full hover:scale-105 transition-transform duration-500">';
+                } else {
+                    echo '    <div class="bg-gradient-to-br from-purple-400 to-blue-500 w-full h-full flex items-center justify-center text-6xl text-white">🎬</div>';
+                }
+                echo '  </a>';
+
+                // 🟣 2️⃣ Phần tiêu đề → bọc <a>
+                echo '  <div class="p-4">';
+                echo '    <a href="booking.php?movie_id=' . htmlspecialchars($row["id"]) . '" class="font-bold text-lg mb-2 block text-gray-800 hover:text-purple-600 transition-colors">';
+                echo          htmlspecialchars($row["title"]);
+                echo '    </a>';
+                echo '    <p class="text-gray-600 text-sm mb-2">' . htmlspecialchars($row["description"]) . '</p>';
+                echo '    <div class="flex justify-between items-center">';
+                echo '      <span class="text-purple-600 font-semibold">' . htmlspecialchars($row["duration"]) . ' phút</span>';
+                echo '      <span class="text-green-600 font-bold">' . number_format($row["price"], 0, ",", ".") . ' VNĐ</span>';
+                echo '    </div>';
+                echo '  </div>';
+
+                echo '</div>';
+              }
+            } else {
+              echo "<p class='text-center'>Không có phim nào để hiển thị.</p>";
+            }
+            ?>
+
+        </div>
+      </div>
+    </main>
+
+    <div
+      id="login-modal"
+      class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50"
+    >
+      <div class="bg-white rounded-xl p-8 max-w-md w-full mx-4">
+        <div class="flex justify-between items-center mb-6">
+          <h3 class="text-2xl font-bold">Đăng Nhập</h3>
+          <button
+            onclick="hideLoginModal()"
+            class="text-gray-500 hover:text-gray-700"
+          >
+            <svg
+              class="w-6 h-6"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M6 18L18 6M6 6l12 12"
+              ></path>
+            </svg>
+          </button>
+        </div>
+        <form action="login.php" method="POST" class="space-y-4">
+          <input
+            type="email"
+            name="email"
+            placeholder="Email"
+            class="w-full px-4 py-3 border rounded-lg"
+            required
+          />
+          <input
+            type="password"
+            name="password"
+            placeholder="Mật khẩu"
+            class="w-full px-4 py-3 border rounded-lg"
+            required
+          />
+          <button
+            type="submit"
+            class="w-full bg-purple-600 text-white py-3 rounded-lg font-semibold hover:bg-purple-700 transition-colors"
+          >
+            Đăng Nhập
+          </button>
+        </form>
+        <?php if (isset($_SESSION['error'])): ?>
+        <div class="bg-red-100 text-red-600 px-4 py-2 rounded mt-3 text-center">
+          <?= htmlspecialchars($_SESSION['error']) ?>
+        </div>
+        <?php endif; ?>
+
+        <div class="text-center mt-4">
+          <a
+            href="#"
+            onclick="openRegister()"
+            class="text-purple-600 hover:underline"
+            >Chưa có tài khoản? Đăng ký ngay</a
+          >
+        </div>
+      </div>
+    </div>
+
+    <div
+      id="Register-modal"
+      class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50"
+    >
+      <div class="bg-white rounded-xl p-8 max-w-md w-full mx-4">
+        <div class="flex justify-between items-center mb-6">
+          <h3 class="text-2xl font-bold">Đăng Ký</h3>
+          <button
+            onclick="hideRegisterModal()"
+            class="text-gray-500 hover:text-gray-700"
+          >
+            <svg
+              class="w-6 h-6"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M6 18L18 6M6 6l12 12"
+              ></path>
+            </svg>
+          </button>
+        </div>
+        <form action="register.php" method="POST" class="space-y-4">
+          <input
+            type="text"
+            name="name"
+            placeholder="Họ và tên"
+            required
+            class="w-full px-4 py-3 border rounded-lg"
+          />
+          <input
+            type="email"
+            name="email"
+            placeholder="Email"
+            required
+            class="w-full px-4 py-3 border rounded-lg"
+          />
+          <input
+            type="text"
+            name="phone"
+            placeholder="Số điện thoại"
+            required
+            class="w-full px-4 py-3 border rounded-lg"
+          />
+          <input
+            type="password"
+            name="password"
+            placeholder="Nhập mật khẩu (tối thiểu 6 ký tự)"
+            required
+            class="w-full px-4 py-3 border rounded-lg"
+          />
+          <input
+            type="password"
+            name="confirm_password"
+            placeholder="Nhập lại mật khẩu"
+            required
+            class="w-full px-4 py-3 border rounded-lg"
+          />
+          <input type="checkbox" id="agreeTerms" required class="mr-2" />
+          <span class="text-sm text-gray-700">
+            Tôi đồng ý với
+            <a href="#" class="text-purple-600 hover:underline"
+              >Điều khoản sử dụng</a
+            >
+            và
+            <a href="#" class="text-purple-600 hover:underline"
+              >Chính sách bảo mật</a
+            >
+          </span>
+          <button
+            type="submit"
+            class="w-full bg-purple-600 text-white py-3 rounded-lg font-semibold hover:bg-purple-700 transition-colors"
+          >
+            Đăng ký
+          </button>
+        </form>
+
+        <?php if (isset($_SESSION['error'])): ?>
+        <div class="bg-red-100 text-red-600 px-4 py-2 rounded mt-3 text-center">
+          <?= htmlspecialchars($_SESSION['error']) ?>
+        </div>
+        <?php unset($_SESSION['error']); ?>
+        <?php endif; ?>
+
+        <?php if (isset($_SESSION['success'])): ?>
+        <div
+          class="bg-green-100 text-green-600 px-4 py-2 rounded mt-3 text-center"
+        >
+          <?= htmlspecialchars($_SESSION['success']) ?>
+        </div>
+        <?php unset($_SESSION['success']); ?>
+        <?php endif; ?>
+
+        <div class="text-center mt-4">
+          <a
+            href="#"
+            onclick="openLogin()"
+            class="text-purple-600 hover:underline"
+            >Đã có tài khoản? Đăng nhập ngay</a
+          >
+        </div>
+      </div>
+    </div>
+    
+    <script src="common.js"></script>
+    
+    <?php if (isset($_SESSION['error'])): ?>
+  <script>
+    document.addEventListener("DOMContentLoaded", function() {
+      let modal = document.getElementById("login-modal");
+      if (modal) {
+        modal.classList.remove("hidden");
+        modal.classList.add("flex");
+      }
+    });
+  </script>
+  <?php unset($_SESSION['error']); ?>
+<?php endif; ?>
+<?php if (isset($_SESSION['show_register']) && $_SESSION['show_register']): ?>
+<script>
+  document.addEventListener("DOMContentLoaded", function() {
+    let modal = document.getElementById("Register-modal");
+    if (modal) {
+      modal.classList.remove("hidden");
+      modal.classList.add("flex");
+    }
+  });
+</script>
+<?php unset($_SESSION['show_register']); ?>
+<?php endif; ?>
+  </body>
+</html>
